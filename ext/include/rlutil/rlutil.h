@@ -40,6 +40,8 @@
 
 #ifdef __cplusplus
 	/// Common C++ headers
+	#define _POSIX_C_SOURCE 199309L
+	#include <ctime>  // for nanosleep
 	#include <iostream>
 	#include <string>
 	#include <cstdio> // for getch()
@@ -49,6 +51,8 @@
 		RLUTIL_INLINE void locate(int x, int y);
 	}
 #else
+	#define _POSIX_C_SOURCE 199309L
+	#include <time.h>  // for nanosleep
 	#include <stdio.h> // for getch() / printf()
 	#include <stdlib.h> // for getenv()
 	#include <string.h> // for strlen()
@@ -87,6 +91,13 @@ int runs_on_ci() {
 	#define getch _getch
 	#define kbhit _kbhit
 #else
+	#ifdef __cplusplus
+		#define _POSIX_C_SOURCE 199309L
+		#include <ctime>  // for nanosleep
+	#else
+		#define _POSIX_C_SOURCE 199309L
+		#include <time.h>  // for nanosleep
+	#endif
 	#include <termios.h> // for getch() and kbhit()
 	#include <unistd.h> // for getch(), kbhit() and (u)sleep()
 	#include <sys/ioctl.h> // for getkey()
@@ -676,9 +687,11 @@ RLUTIL_INLINE void msleep(unsigned int ms) {
 #ifdef _WIN32
 	Sleep(ms);
 #else
-	// usleep argument must be under 1 000 000
-	if (ms > 1000) sleep(ms/1000000);
-	usleep((ms % 1000000) * 1000);
+    
+	struct timespec ts;
+    ts.tv_sec = microseconds / 1000000ul;            // whole seconds
+    ts.tv_nsec = (microseconds % 1000000ul) * 1000;  // remainder, in nanoseconds
+    nanosleep(&ts, NULL);
 #endif
 }
 

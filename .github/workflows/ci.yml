@@ -143,7 +143,6 @@ jobs:
 
       - name: Copy stdlib (MinGW)
         if: runner.os == 'Windows' && matrix.cc == 'gcc'
-        # static linking might not work with MinGW, might be easier this way
         run: |
           cp $(where gcc)/libstdc++-6.dll \
             $(where gcc)/libgcc_s_seh-1.dll \

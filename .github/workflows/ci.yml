@@ -119,13 +119,13 @@ jobs:
           vcver=$(cat "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/Microsoft.VCToolsVersion.default.txt")
           CC="C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/${vcver}/bin/Hostx64/x64/cl.exe"
           "${CC}"
-          "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat" && \
+          cd "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/" && vcvars64.bat && \
+          cd ${GITHUB_WORKSPACE} && \
           "${CC}" *.c -W4 -WX -permissive- \
             -wd4244 -wd4267 -wd4996 \
             -std:c11 \
             -external:anglebrackets -external:W0 \
-            -link \
-            -out:"${EXECUTABLE_NAME}".exe
+            -link -out:"${EXECUTABLE_NAME}".exe
 
       - name: Run
         if: runner.os != 'Windows'
@@ -150,7 +150,7 @@ jobs:
           echo "ZIP_NAME=$(echo "${GITHUB_REPOSITORY}_${{ matrix.os }}_${{ matrix.cxx }}" | sed 's|/|_|')" >> ${GITHUB_ENV}
           # or use only the repo name (github does not have a predefined environment variable for this)
           # the regex splits by / and keeps everything after / without the / character
-          echo "ZIP_NAME=$(echo "${GITHUB_REPOSITORY}_${{ matrix.os }}_${{ matrix.cxx }}" | sed -E 's|.+/(.+)|\1|')" >> ${GITHUB_ENV}
+          # echo "ZIP_NAME=$(echo "${GITHUB_REPOSITORY}_${{ matrix.os }}_${{ matrix.cxx }}" | sed -E 's|.+/(.+)|\1|')" >> ${GITHUB_ENV}
 
       - name: Copy project files
         run: |

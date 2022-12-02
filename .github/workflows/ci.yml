@@ -132,7 +132,7 @@ jobs:
         if: runner.os == 'Linux' && startsWith(matrix.cc, 'gcc')
         run: |
           # remove --show-leak-kinds=all (and --track-origins=yes) if there are many leaks in external libs
-          cat "${INPUT_FILENAME}" | tr -d '\r' | valgrind
+          cat "${INPUT_FILENAME}" | tr -d '\r' | valgrind \
             --leak-check=full \
             --show-leak-kinds=all \
             --track-origins=yes \

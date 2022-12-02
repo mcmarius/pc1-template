@@ -127,12 +127,12 @@ jobs:
           "${CC}"
 
           cmd.exe /V /C @ "${cmdvcprefix}\Auxiliary\Build\vcvars64.bat" "&&" \
-          "${CC2}" -W4 -WX -permissive- \
+          "%CC2%" -W4 -WX -permissive- \
             -wd4244 -wd4267 -wd4996 \
             -std:c11 \
             -external:anglebrackets -external:W0 \
             *.c \
-            -link -out:"${EXECUTABLE_NAME}".exe
+            -link -out:"%EXECUTABLE_NAME%".exe
 
           echo "ls"
           ls

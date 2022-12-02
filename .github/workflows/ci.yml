@@ -144,9 +144,9 @@ jobs:
       - name: Copy stdlib (MinGW)
         if: runner.os == 'Windows' && matrix.cc == 'gcc'
         run: |
-          cp $(where libstdc++-6.dll) \
-            $(where libgcc_s_seh-1.dll) \
-            $(where libwinpthread-1.dll) \
+          cp "$(where libstdc++-6.dll)" \
+            "$(where libgcc_s_seh-1.dll)" \
+            "$(where libwinpthread-1.dll)" \
             ${GITHUB_WORKSPACE}/${{ env.ZIP_NAME }}
 
       - name: Upload Artifacts

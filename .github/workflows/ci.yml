@@ -22,29 +22,29 @@ defaults:
     shell: bash
 
 jobs:
-  cppcheck:
-    name: Cppcheck
-    runs-on: ubuntu-22.04
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
+  # cppcheck:
+  #   name: Cppcheck
+  #   runs-on: ubuntu-22.04
+  #   permissions:
+  #     contents: write
+  #   steps:
+  #     - name: Checkout repo
+  #       uses: actions/checkout@v3
       
-      - name: Install cppcheck
-        run: |
-          sudo apt-get update
-          sudo apt-get install --no-install-recommends cppcheck
+  #     - name: Install cppcheck
+  #       run: |
+  #         sudo apt-get update
+  #         sudo apt-get install --no-install-recommends cppcheck
 
-      - name: Run cppcheck
-        run: |
-          cppcheck --enable=all \
-                   -i"${BUILD_DIR}" --suppress='*:"${BUILD_DIR}"/*' \
-                   -i"${EXT_DIR}" --suppress='*:"${EXT_DIR}"/*' \
-                   --suppress=missingIncludeSystem \
-                   --suppress=unmatchedSuppression \
-                   --error-exitcode=1 \
-                   .
+  #     - name: Run cppcheck
+  #       run: |
+  #         cppcheck --enable=all \
+  #                  -i"${BUILD_DIR}" --suppress='*:"${BUILD_DIR}"/*' \
+  #                  -i"${EXT_DIR}" --suppress='*:"${EXT_DIR}"/*' \
+  #                  --suppress=missingIncludeSystem \
+  #                  --suppress=unmatchedSuppression \
+  #                  --error-exitcode=1 \
+  #                  .
 
 
   build-and-run:
@@ -61,27 +61,27 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-22.04
-            cc: clang-14
-            name: Ubuntu 22 Clang 14
-            flags: -stdlib=libc++
-          - os: ubuntu-22.04
-            cc: gcc-12
-            name: Ubuntu 22 GCC 12
+          # - os: ubuntu-22.04
+          #   cc: clang-14
+          #   name: Ubuntu 22 Clang 14
+          #   flags: -stdlib=libc++
+          # - os: ubuntu-22.04
+          #   cc: gcc-12
+          #   name: Ubuntu 22 GCC 12
 
-          - os: macos-12
-            cc: clang
-            name: macOS 12 Apple Clang 14
-          - os: macos-12
-            cc: gcc-11
-            name: macOS 12 GCC 11
+          # - os: macos-12
+          #   cc: clang
+          #   name: macOS 12 Apple Clang 14
+          # - os: macos-12
+          #   cc: gcc-11
+          #   name: macOS 12 GCC 11
 
           - os: windows-2022
             cc: cl
             name: Windows 2022 MSVC 19.33
-          - os: windows-2022
-            cc: gcc
-            name: Windows 2022 MinGW GCC 11
+          # - os: windows-2022
+          #   cc: gcc
+          #   name: Windows 2022 MinGW GCC 11
 
     steps:
       - name: Checkout repo
@@ -119,7 +119,7 @@ jobs:
           vcver=$(cat "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/Microsoft.VCToolsVersion.default.txt")
           CC="C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/${vcver}/bin/Hostx64/x64/cl.exe"
           "${CC}"
-          cd "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/" && vcvars64.bat && \
+          cd "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/" && ./vcvars64.bat && \
           cd ${GITHUB_WORKSPACE} && \
           "${CC}" *.c -W4 -WX -permissive- \
             -wd4244 -wd4267 -wd4996 \
@@ -147,10 +147,10 @@ jobs:
         run: |
           echo "TIMESTAMP=$(date +%Y-%m-%d-%H-%M-%S)" >> ${GITHUB_ENV}
           # use the full name as prefix: {user_name}_{repo_name} (replace / with _)
-          echo "ZIP_NAME=$(echo "${GITHUB_REPOSITORY}_${{ matrix.os }}_${{ matrix.cxx }}" | sed 's|/|_|')" >> ${GITHUB_ENV}
+          echo "ZIP_NAME=$(echo "${GITHUB_REPOSITORY}_${{ matrix.os }}_${{ matrix.cc }}" | sed 's|/|_|')" >> ${GITHUB_ENV}
           # or use only the repo name (github does not have a predefined environment variable for this)
           # the regex splits by / and keeps everything after / without the / character
-          # echo "ZIP_NAME=$(echo "${GITHUB_REPOSITORY}_${{ matrix.os }}_${{ matrix.cxx }}" | sed -E 's|.+/(.+)|\1|')" >> ${GITHUB_ENV}
+          # echo "ZIP_NAME=$(echo "${GITHUB_REPOSITORY}_${{ matrix.os }}_${{ matrix.cc }}" | sed -E 's|.+/(.+)|\1|')" >> ${GITHUB_ENV}
 
       - name: Copy project files
         run: |

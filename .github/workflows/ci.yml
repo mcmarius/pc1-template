@@ -46,7 +46,7 @@ jobs:
                    .
 
 
-  "Build and run":
+  Build_and_run:
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 10

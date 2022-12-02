@@ -687,10 +687,9 @@ RLUTIL_INLINE void msleep(unsigned int ms) {
 #ifdef _WIN32
 	Sleep(ms);
 #else
-    
 	struct timespec ts;
-    ts.tv_sec = microseconds / 1000000ul;            // whole seconds
-    ts.tv_nsec = (microseconds % 1000000ul) * 1000;  // remainder, in nanoseconds
+    ts.tv_sec = ms / 1000000ul;            // whole seconds
+    ts.tv_nsec = (ms % 1000000ul) * 1000;  // remainder, in nanoseconds
     nanosleep(&ts, NULL);
 #endif
 }

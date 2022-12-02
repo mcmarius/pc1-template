@@ -8,17 +8,18 @@ on:
   pull_request:
     branches: [main] # NOTE: replace/update with appropriate branch name(s)
 
+env:
+  EXECUTABLE_NAME: "main"
+  INPUT_FILENAME: "tastatura.txt"
+  BUILD_DIR: "build"
+  EXT_DIR: "ext"
+
 defaults:
   run:
     # Use a bash shell, so we can use the same syntax for environment variable
     # access regardless of the host operating system
     # https://github.com/saxbophone/CPP20-Cross-Platform-Template
     shell: bash
-    env:
-      EXECUTABLE_NAME: "main"
-      INPUT_FILENAME: "tastatura.txt"
-      BUILD_DIR: "build"
-      EXT_DIR: "ext"
 
 jobs:
   cppcheck:

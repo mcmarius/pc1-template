@@ -14,11 +14,11 @@ defaults:
     # access regardless of the host operating system
     # https://github.com/saxbophone/CPP20-Cross-Platform-Template
     shell: bash
-  env:
-    EXECUTABLE_NAME: "main"
-    INPUT_FILENAME: "tastatura.txt"
-    BUILD_DIR: "build"
-    EXT_DIR: "ext"
+    env:
+      EXECUTABLE_NAME: "main"
+      INPUT_FILENAME: "tastatura.txt"
+      BUILD_DIR: "build"
+      EXT_DIR: "ext"
 
 jobs:
   cppcheck:

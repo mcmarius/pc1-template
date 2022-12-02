@@ -119,18 +119,24 @@ jobs:
           # env
           vcprefix="C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/"
           cmdvcprefix=$(echo "${vcprefix}" | sed "s|\/|\\\|g")
+
           echo "CMD prefix: ${cmdvcprefix}"
           vcver=$(cat "${vcprefix}/Auxiliary/Build/Microsoft.VCToolsVersion.default.txt")
           CC="${vcprefix}/Tools/MSVC/${vcver}/bin/Hostx64/x64/cl.exe"
-          CC2="${cmdvcprefix}\Tools\MSVC\${vcver}\bin\Hostx64\x64\cl.exe"
+          CC2=$(echo "${CC}" | sed "s|\/|\\\|g")
           "${CC}"
-          cmd.exe /V /C @ "${cmdvcprefix}\Auxiliary\Build\vcvars64.bat" "&&" \
-          cd ${GITHUB_WORKSPACE} "&&" \
-          "${CC2}" *.c -W4 -WX -permissive- \
+
+          cmd.exe /V /C @ "${cmdvcprefix}\Auxiliary\Build\vcvars64.bat" && \
+          "${CC2}" -W4 -WX -permissive- \
             -wd4244 -wd4267 -wd4996 \
             -std:c11 \
             -external:anglebrackets -external:W0 \
+            *.c \
             -link -out:"${EXECUTABLE_NAME}".exe
+
+          echo "ls"
+          ls
+          pwd
 
       - name: Run
         if: runner.os != 'Windows'

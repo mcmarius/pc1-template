@@ -114,12 +114,13 @@ jobs:
 
       - name: Build (MSVC)
         if: matrix.cc == 'cl'
+        # shell: cmd
         run: |
           # env
           vcver=$(cat "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/Microsoft.VCToolsVersion.default.txt")
           CC="C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Tools/MSVC/${vcver}/bin/Hostx64/x64/cl.exe"
           "${CC}"
-          VSCMD_DEBUG=3 cd "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/" && ./vcvars64.bat && env && \
+          cmd.exe /V /C @ "C:/Program Files/Microsoft Visual Studio/2022/Enterprise/VC/Auxiliary/Build/vcvars64.bat" && env && \
           cd ${GITHUB_WORKSPACE} && \
           "${CC}" *.c -W4 -WX -permissive- \
             -wd4244 -wd4267 -wd4996 \

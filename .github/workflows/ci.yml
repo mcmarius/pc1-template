@@ -22,29 +22,29 @@ defaults:
     shell: bash
 
 jobs:
-  # cppcheck:
-  #   name: Cppcheck
-  #   runs-on: ubuntu-22.04
-  #   permissions:
-  #     contents: write
-  #   steps:
-  #     - name: Checkout repo
-  #       uses: actions/checkout@v3
+  cppcheck:
+    name: Cppcheck
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
       
-  #     - name: Install cppcheck
-  #       run: |
-  #         sudo apt-get update
-  #         sudo apt-get install --no-install-recommends cppcheck
+      - name: Install cppcheck
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends cppcheck
 
-  #     - name: Run cppcheck
-  #       run: |
-  #         cppcheck --enable=all \
-  #                  -i"${BUILD_DIR}" --suppress='*:"${BUILD_DIR}"/*' \
-  #                  -i"${EXT_DIR}" --suppress='*:"${EXT_DIR}"/*' \
-  #                  --suppress=missingIncludeSystem \
-  #                  --suppress=unmatchedSuppression \
-  #                  --error-exitcode=1 \
-  #                  .
+      - name: Run cppcheck
+        run: |
+          cppcheck --enable=all \
+                   -i"${BUILD_DIR}" --suppress='*:"${BUILD_DIR}"/*' \
+                   -i"${EXT_DIR}" --suppress='*:"${EXT_DIR}"/*' \
+                   --suppress=missingIncludeSystem \
+                   --suppress=unmatchedSuppression \
+                   --error-exitcode=1 \
+                   .
 
 
   build-and-run:

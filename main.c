@@ -1,3 +1,4 @@
+// NOTE: must include this header first
 #include <rlutil.h>
 #include <stdio.h>
 #include <stdlib.h>

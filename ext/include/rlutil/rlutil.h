@@ -91,13 +91,6 @@ int runs_on_ci() {
 	#define getch _getch
 	#define kbhit _kbhit
 #else
-	#ifdef __cplusplus
-		#define _POSIX_C_SOURCE 199309L
-		#include <ctime>  // for nanosleep
-	#else
-		#define _POSIX_C_SOURCE 199309L
-		#include <time.h>  // for nanosleep
-	#endif
 	#include <termios.h> // for getch() and kbhit()
 	#include <unistd.h> // for getch(), kbhit() and (u)sleep()
 	#include <sys/ioctl.h> // for getkey()

@@ -1,6 +1,6 @@
+#include <rlutil.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <rlutil.h>
 
 int main() {
     int n, rez;

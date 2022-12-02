@@ -141,7 +141,7 @@ jobs:
              ${{ env.ZIP_NAME }}
 
       - name: Copy stdlib (MinGW)
-        if: runner.os == 'Windows' && matrix.cxx == 'g++'
+        if: runner.os == 'Windows' && matrix.cc == 'gcc'
         # static linking might not work with MinGW, might be easier this way
         run: |
           cd gcc/mingw64/bin

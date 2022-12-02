@@ -14,9 +14,6 @@ defaults:
     # access regardless of the host operating system
     # https://github.com/saxbophone/CPP20-Cross-Platform-Template
     shell: bash
-  timeout-minutes: 10
-  permissions:
-    contents: write
   env:
     EXECUTABLE_NAME: "main"
     INPUT_FILENAME: "tastatura.txt"
@@ -27,6 +24,8 @@ jobs:
   cppcheck:
     name: Cppcheck
     runs-on: ubuntu-22.04
+    permissions:
+      contents: write
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -50,6 +49,9 @@ jobs:
   build-and-run:
     name: ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    permissions:
+      contents: write
 
     env:
       CC: ${{ matrix.cc }}

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <rlutil.h>
 
 int main() {
     int n, rez;
@@ -33,6 +34,7 @@ int main() {
         printf("v[%d]: %d\n", i, v[i]);
 
     free(v);
+    cls();
 
     return 0;
 }

@@ -110,6 +110,7 @@ jobs:
             -std=c11 \
             ${{ matrix.flags }} \
             -I. \
+            -Iext/include/rlutil \
             -o "${EXECUTABLE_NAME}" \
             -lm
 

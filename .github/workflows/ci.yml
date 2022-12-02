@@ -1,0 +1,126 @@
+
+name: Continuous Integration
+
+on:
+  push:
+    branches: [main] # NOTE: replace/update with appropriate branch name(s)
+    tags: ['*']
+  pull_request:
+    branches: [main] # NOTE: replace/update with appropriate branch name(s)
+
+defaults:
+  run:
+    # Use a bash shell, so we can use the same syntax for environment variable
+    # access regardless of the host operating system
+    # https://github.com/saxbophone/CPP20-Cross-Platform-Template
+    shell: bash
+  timeout-minutes: 10
+  permissions:
+    contents: write
+  env:
+    EXECUTABLE_NAME: "main"
+    INPUT_FILENAME: "tastatura.txt"
+    BUILD_DIR: "build"
+    EXT_DIR: "ext"
+
+jobs:
+  cppcheck:
+    name: Cppcheck
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      
+      - name: Install cppcheck
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends cppcheck
+
+      - name: Run cppcheck
+        run: |
+          cppcheck --enable=all \
+                   -i"${BUILD_DIR}" --suppress='*:"${BUILD_DIR}"/*' \
+                   -i"${EXT_DIR}" --suppress='*:"${EXT_DIR}"/*' \
+                   --suppress=missingIncludeSystem \
+                   --suppress=unmatchedSuppression \
+                   --error-exitcode=1 \
+                   .
+
+
+  build-and-run:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+
+    env:
+      CC: ${{ matrix.cc }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            cc: clang-14
+            name: Ubuntu 22 Clang 14
+            flags: -stdlib=libc++
+          - os: ubuntu-22.04
+            cc: gcc-12
+            name: Ubuntu 22 GCC 12
+
+          - os: macos-12
+            cc: clang
+            name: macOS 12 Apple Clang 14
+          - os: macos-12
+            cc: gcc-11
+            name: macOS 12 GCC 11
+
+          - os: windows-2022
+            cc: cl
+            name: Windows 2022 MSVC 19.33
+          - os: windows-2022
+            cc: gcc
+            name: Windows 2022 MinGW GCC ??
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Install Valgrind
+        if: runner.os == 'Linux' && startsWith(matrix.cc, 'gcc')
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends valgrind
+
+      # temp workaround, there is a bug in xcode linker 14.0
+      - name: Setup Xcode version
+        if: runner.os == 'macOS' && startsWith(matrix.cc, 'gcc')
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '13.4.1'
+
+      - name: Build
+        if: matrix.cc != 'cl'
+        run: |
+          "${CC}" --version
+          "${CC}" *.c -Wall -Wextra -pedantic -Werror ${{ matrix.flags }} -I. -o "${EXECUTABLE_NAME}"
+
+      - name: Build (MSVC)
+        if: matrix.cc == 'cl'
+        run: |
+          "${CC}"
+          "${CC}" *.c /W4 /WX /permissive- /wd4244 /wd4267 /wd4996 /external:anglebrackets /external:W0 /link /out:"${EXECUTABLE_NAME}".exe
+
+      - name: Run
+        if: runner.os != 'Windows'
+        run: |
+          cat "${INPUT_FILENAME}" | tr -d '\r' | ./"${EXECUTABLE_NAME}"
+
+      - name: Run (MSVC)
+        if: matrix.cc == 'cl'
+        run: |
+          cat "${INPUT_FILENAME}" | ./"${EXECUTABLE_NAME}".exe
+
+      - name: Run with Valgrind
+        if: runner.os == 'Linux' && startsWith(matrix.cc, 'gcc')
+        run: |
+          # remove --show-leak-kinds=all (and --track-origins=yes) if there are many leaks in external libs
+          cat "${INPUT_FILENAME}" | tr -d '\r' | valgrind --leak-check=full --show-leak-kinds=all --track-origins=yes --error-exitcode=1 ./"${EXECUTABLE_NAME}"

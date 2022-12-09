@@ -115,7 +115,7 @@ jobs:
         run: |
           "${CC}" --version
           "${CC}" *.c \
-            -Wall -Wextra -pedantic -Werror -g \
+            -Wall -Wextra -Werror -g \
             -std=c11 \
             ${{ matrix.flags }} \
             -I. \

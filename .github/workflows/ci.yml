@@ -87,10 +87,13 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Install Valgrind and SFML/CSFML
+      - name: Update Linux deps
+        if: runner.os == 'Linux'
+        run: sudo apt-get update
+
+      - name: Install Valgrind
         if: runner.os == 'Linux' && startsWith(matrix.cc, 'gcc')
         run: |
-          sudo apt-get update
           sudo apt-get install --no-install-recommends valgrind
 
       - name: Install SFML/CSFML

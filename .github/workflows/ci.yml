@@ -149,7 +149,7 @@ jobs:
             -std=c11 \
             ${{ matrix.flags }} \
             -I. \
-            -Iext/include/rlutil \
+            -isystem ext/include/rlutil \
             -o "${EXECUTABLE_NAME}" \
             -lm \
             -lcsfml-graphics -lcsfml-window -lcsfml-system \
@@ -170,8 +170,8 @@ jobs:
             -std=c11 \
             ${{ matrix.flags }} \
             -I. \
-            -Icsfml/include \
-            -Iext/include/rlutil \
+            -isystem csfml/include \
+            -isystem ext/include/rlutil \
             -o "${EXECUTABLE_NAME}" \
             -Lcsfml/lib/gcc \
             -lm \

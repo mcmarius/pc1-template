@@ -164,7 +164,7 @@ jobs:
       - name: Copy deps
         if: runner.os == 'Linux'
         run: |
-          cp libs/* ${{ env.ZIP_NAME }}/libs
+          cp -r libs/ ${{ env.ZIP_NAME }}/
 
       ########################################################################
 

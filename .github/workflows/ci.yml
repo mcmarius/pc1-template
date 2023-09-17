@@ -115,11 +115,12 @@ jobs:
           key: ${{ runner.os }}-csfml-${{ env.CSFML_VER }}
 
       - name: Download CSFML (Windows)
-        uses: suisei-cn/actions-download-file@v1
+        uses: suisei-cn/actions-download-file@v1.4
         if: runner.os == 'Windows' && steps.cache-csfml.outputs.cache-hit != 'true'
         with:
           url: "https://www.sfml-dev.org/files/CSFML-${{ env.CSFML_VER }}-windows-64-bit.zip"
-          target: csfml/
+          target: csfml_dir/
+          output: csfml.zip
 
       # temp workaround, there is a bug in xcode linker 14.0
       - name: Setup Xcode version
@@ -159,7 +160,10 @@ jobs:
       - name: Build (Windows)
         if: runner.os == 'Windows'
         run: |
-          7z x csfml/CSFML-${{ env.CSFML_VER }}-windows-64-bit.zip -ocsfml
+          ls
+          echo "--------"
+          ls csfml_dir
+          7z x csfml_dir/csfml.zip -ocsfml
           "${CC}" --version
           "${CC}" *.c \
             -Wall -Wextra -Werror -g \
@@ -201,6 +205,7 @@ jobs:
         if: runner.os == 'Linux'
         run: |
           cp -r libs/ ${{ env.ZIP_NAME }}/
+          chmod +x ${{ env.ZIP_NAME }}/"${EXECUTABLE_NAME}"
 
       - name: Copy deps (Windows)
         if: runner.os == 'Windows'

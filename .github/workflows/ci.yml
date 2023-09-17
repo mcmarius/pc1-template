@@ -79,10 +79,10 @@ jobs:
             flags: -stdlib=libc++
             linker_flags: -lm -Wl,-rpath="\$ORIGIN/libs",--disable-new-dtags
 
-          # - os: macos-12
-          #   cc: clang
-          #   name: macOS 12 Apple Clang 14
-          #   flags: -stdlib=libc++
+          - os: macos-12
+            cc: clang
+            name: macOS 12 Apple Clang 14
+            flags: -stdlib=libc++ -DSFML_BUILD_FRAMEWORKS=FALSE
 
           # - os: macos-12
           #   cc: gcc-11
@@ -129,6 +129,11 @@ jobs:
         run: |
           7z x csfml_dir/csfml.zip -ocsfml
 
+      - name: Install CSFML (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          brew install csfml
+
       # temp workaround, there is a bug in xcode linker 14.0
       - name: Setup Xcode version
         if: runner.os == 'macOS' && startsWith(matrix.cc, 'gcc')
@@ -148,7 +153,7 @@ jobs:
       ########################################################################
 
       - name: Build
-        if: runner.os == 'Linux' || runner.os == 'Windows'
+        # if: runner.os == 'Linux' || runner.os == 'Windows'
         run: |
           "${CC}" --version
           "${CC}" *.c \

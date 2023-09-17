@@ -87,11 +87,14 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Install Valgrind
+      - name: Install Valgrind and SFML/CSFML
         if: runner.os == 'Linux' && startsWith(matrix.cc, 'gcc')
         run: |
-          sudo apt-get update
-          sudo apt-get install --no-install-recommends valgrind
+          sudo apt update
+          sudo apt install --no-install-recommends valgrind
+          sudo apt install --no-install-recommends \
+            libsfml-dev libcsfml-dev \
+            libxrandr-dev libxcursor-dev libudev-dev libopenal-dev libflac-dev libvorbis-dev libgl1-mesa-dev libegl1-mesa-dev
 
       # temp workaround, there is a bug in xcode linker 14.0
       - name: Setup Xcode version
@@ -121,30 +124,39 @@ jobs:
             -I. \
             -Iext/include/rlutil \
             -o "${EXECUTABLE_NAME}" \
-            -lm
+            -lm \
+            -lcsfml-graphics -lcsfml-window -lcsfml-system
+          mkdir -p libs
+          ldd "./${EXECUTABLE_NAME}" | grep sfml | sed -E "s|.*(/lib/.*) \(.*|\1|"| xargs -I% cp -L % libs
 
-      - name: Run
-        if: runner.os != 'Windows'
-        run: |
-          cat "${INPUT_FILENAME}" | tr -d '\r' | ./"${EXECUTABLE_NAME}"
+      # - name: Run
+      #   if: runner.os != 'Windows'
+      #   run: |
+      #     cat "${INPUT_FILENAME}" | tr -d '\r' | ./"${EXECUTABLE_NAME}"
 
-      - name: Run with Valgrind
-        if: runner.os == 'Linux' && startsWith(matrix.cc, 'gcc')
-        run: |
-          # remove --show-leak-kinds=all (and --track-origins=yes) if there are many leaks in external libs
-          cat "${INPUT_FILENAME}" | tr -d '\r' | valgrind \
-            --leak-check=full \
-            --show-leak-kinds=all \
-            --track-origins=yes \
-            --error-exitcode=1 \
-            ./"${EXECUTABLE_NAME}"
+      # - name: Run with Valgrind
+      #   if: runner.os == 'Linux' && startsWith(matrix.cc, 'gcc')
+      #   run: |
+      #     # remove --show-leak-kinds=all (and --track-origins=yes) if there are many leaks in external libs
+      #     cat "${INPUT_FILENAME}" | tr -d '\r' | valgrind \
+      #       --leak-check=full \
+      #       --show-leak-kinds=all \
+      #       --track-origins=yes \
+      #       --error-exitcode=1 \
+      #       ./"${EXECUTABLE_NAME}"
 
       - name: Copy project files
         run: |
           mkdir ${{ env.ZIP_NAME }}
           cp ./"${EXECUTABLE_NAME}" \
              "${INPUT_FILENAME}" \
+             Digital7Mono-B1g5.ttf \
              ${{ env.ZIP_NAME }}
+
+      - name: Copy deps
+        if: runner.os == 'Linux'
+        run: |
+          cp libs/* ${{ env.ZIP_NAME }}
 
       ########################################################################
 

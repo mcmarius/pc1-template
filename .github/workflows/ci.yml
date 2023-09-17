@@ -82,7 +82,7 @@ jobs:
           - os: macos-12
             cc: clang
             name: macOS 12 Apple Clang 14
-            flags: -stdlib=libc++ -DSFML_BUILD_FRAMEWORKS=FALSE
+            flags: -stdlib=libc++ -DSFML_BUILD_FRAMEWORKS=FALSE --system-header-prefix=/usr/local/include
 
           # - os: macos-12
           #   cc: gcc-11
@@ -133,7 +133,6 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           brew install csfml
-          xcode-select --install
 
       # temp workaround, there is a bug in xcode linker 14.0
       - name: Setup Xcode version

@@ -108,7 +108,7 @@ jobs:
       - name: Install SFML (Windows)
         if: runner.os == 'Windows'
         run: |
-          vcpkg install sfml
+          vcpkg install --triplet=x64-mingw-dynamic sfml
 
       - name: Cache CSFML
         uses: actions/cache@v3

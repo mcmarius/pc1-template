@@ -113,7 +113,7 @@ jobs:
         id: cache-csfml
         if: runner.os == 'Windows'
         with:
-          path: csfml
+          path: csfml_dir
           key: ${{ runner.os }}-csfml-${{ env.CSFML_VER }}
 
       - name: Download CSFML (Windows)

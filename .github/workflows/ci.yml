@@ -12,6 +12,7 @@ env:
   INPUT_FILENAME: "tastatura.txt"
   BUILD_DIR: "build"
   EXT_DIR: "ext"
+  CSFML_VER: "2.5.1"
 
 defaults:
   run:
@@ -62,6 +63,7 @@ jobs:
           - os: ubuntu-22.04
             cc: gcc-12
             name: Ubuntu 22 GCC 12
+            runs_valgrind: true
           - os: ubuntu-22.04
             cc: clang-14
             name: Ubuntu 22 Clang 14
@@ -71,13 +73,13 @@ jobs:
             name: Ubuntu 20 Clang 12
             flags: -stdlib=libc++
 
-          - os: macos-12
-            cc: clang
-            name: macOS 12 Apple Clang 14
-            flags: -stdlib=libc++
-          - os: macos-12
-            cc: gcc-11
-            name: macOS 12 GCC 11
+          # - os: macos-12
+          #   cc: clang
+          #   name: macOS 12 Apple Clang 14
+          #   flags: -stdlib=libc++
+          # - os: macos-12
+          #   cc: gcc-11
+          #   name: macOS 12 GCC 11
 
           - os: windows-2022
             cc: gcc
@@ -91,17 +93,38 @@ jobs:
         if: runner.os == 'Linux'
         run: sudo apt-get update
 
-      - name: Install Valgrind
-        if: runner.os == 'Linux' && startsWith(matrix.cc, 'gcc')
-        run: |
-          sudo apt-get install --no-install-recommends valgrind
+      # - name: Install Valgrind
+      #   if: runner.os == 'Linux' && matrix.runs_valgrind == true
+      #   run: |
+      #     sudo apt-get install --no-install-recommends valgrind
 
-      - name: Install SFML/CSFML
+      - name: Install SFML/CSFML (Linux)
         if: runner.os == 'Linux'
         run: |
           sudo apt-get install --no-install-recommends \
             libsfml-dev libcsfml-dev \
             libxrandr-dev libxcursor-dev libudev-dev libopenal-dev libflac-dev libvorbis-dev libgl1-mesa-dev libegl1-mesa-dev
+
+      - name: Install SFML (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          vcpkg install sfml
+
+      - name: Cache CSFML
+        uses: actions/cache@v3
+        id: cache-csfml
+        if: runner.os == 'Windows'
+        with:
+          path: csfml
+          key: ${{ runner.os }}-${{ env.CSFML_VER }}
+
+      - name: Download CSFML (Windows)
+        uses: suisei-cn/actions-download-file@v1
+        id: download-csfml
+        if: runner.os == 'Windows' && steps.cache-csfml.outputs.cache-hit != 'true'
+        with:
+          url: "https://www.sfml-dev.org/files/CSFML-${{ env.CSFML_VER }}-windows-64-bit.zip"
+          target: csfml/
 
       # temp workaround, there is a bug in xcode linker 14.0
       - name: Setup Xcode version
@@ -121,7 +144,8 @@ jobs:
 
       ########################################################################
 
-      - name: Build
+      - name: Build (Linux)
+        if: runner.os == 'Linux'
         run: |
           "${CC}" --version
           "${CC}" *.c \
@@ -137,13 +161,28 @@ jobs:
           mkdir -p libs
           ldd "./${EXECUTABLE_NAME}" | grep sfml | sed -E "s|.*(/lib/.*) \(.*|\1|"| xargs -I% cp -L % libs
 
+      - name: Build (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          "${CC}" --version
+          "${CC}" *.c \
+            -Wall -Wextra -Werror -g \
+            -std=c11 \
+            ${{ matrix.flags }} \
+            -I. \
+            -I
+            -Iext/include/rlutil \
+            -o "${EXECUTABLE_NAME}" \
+            -lm \
+            -lcsfml-graphics -lcsfml-window -lcsfml-system
+
       # - name: Run
       #   if: runner.os != 'Windows'
       #   run: |
       #     cat "${INPUT_FILENAME}" | tr -d '\r' | ./"${EXECUTABLE_NAME}"
 
       # - name: Run with Valgrind
-      #   if: runner.os == 'Linux' && startsWith(matrix.cc, 'gcc')
+      #   if: runner.os == 'Linux' && matrix.runs_valgrind == true
       #   run: |
       #     # remove --show-leak-kinds=all (and --track-origins=yes) if there are many leaks in external libs
       #     cat "${INPUT_FILENAME}" | tr -d '\r' | valgrind \

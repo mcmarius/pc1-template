@@ -133,7 +133,7 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           brew install csfml
-          xcode-select install
+          xcode-select --install
 
       # temp workaround, there is a bug in xcode linker 14.0
       - name: Setup Xcode version

@@ -106,31 +106,13 @@ jobs:
             libsfml-dev libcsfml-dev \
             libxrandr-dev libxcursor-dev libudev-dev libopenal-dev libflac-dev libvorbis-dev libgl1-mesa-dev libegl1-mesa-dev
 
-      - name: Cache SFML
-        uses: actions/cache@v3
-        id: cache-sfml
-        if: runner.os == 'Windows'
-        with:
-          path: SFML
-          key: ${{ runner.os }}-${{ env.SFML_VER }}
-
-      - name: Download SFML (Windows)
-        if: runner.os == 'Windows' && steps.cache-sfml.outputs.cache-hit != 'true'
-        run: |
-          git clone --depth 1 --branch 2.5.1 https://github.com/SFML/SFML.git
-          cd SFML
-          CMAKE_GENERATOR=Ninja cmake -B sfml_build -S . -DCMAKE_INSTALL_PREFIX=sfml_bin
-          cmake --build sfml_build
-          cmake --install sfml_build
-          ls -l
-
       - name: Cache CSFML
         uses: actions/cache@v3
         id: cache-csfml
         if: runner.os == 'Windows'
         with:
           path: csfml
-          key: ${{ runner.os }}-${{ env.CSFML_VER }}
+          key: ${{ runner.os }}-csfml-${{ env.CSFML_VER }}
 
       - name: Download CSFML (Windows)
         uses: suisei-cn/actions-download-file@v1
@@ -177,15 +159,17 @@ jobs:
       - name: Build (Windows)
         if: runner.os == 'Windows'
         run: |
+          7z x csfml/CSFML-${{ env.CSFML_VER }}-windows-64-bit.zip -ocsfml
           "${CC}" --version
           "${CC}" *.c \
             -Wall -Wextra -Werror -g \
             -std=c11 \
             ${{ matrix.flags }} \
             -I. \
-            -I
+            -Icsfml/include \
             -Iext/include/rlutil \
             -o "${EXECUTABLE_NAME}" \
+            -Lcsfml/lib/gcc \
             -lm \
             -lcsfml-graphics -lcsfml-window -lcsfml-system
 
@@ -213,10 +197,15 @@ jobs:
              Digital7Mono-B1g5.ttf \
              ${{ env.ZIP_NAME }}
 
-      - name: Copy deps
+      - name: Copy deps (Linux)
         if: runner.os == 'Linux'
         run: |
           cp -r libs/ ${{ env.ZIP_NAME }}/
+
+      - name: Copy deps (Windows)
+        if: runner.os == 'Windows'
+        run: |
+          cp csfml/bin/*.dll ${{ env.ZIP_NAME }}/
 
       ########################################################################
 

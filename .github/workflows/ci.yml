@@ -120,7 +120,7 @@ jobs:
         with:
           url: "https://www.sfml-dev.org/files/CSFML-${{ env.CSFML_VER }}-windows-64-bit.zip"
           target: csfml_dir/
-          output: csfml.zip
+          filename: csfml.zip
 
       # temp workaround, there is a bug in xcode linker 14.0
       - name: Setup Xcode version

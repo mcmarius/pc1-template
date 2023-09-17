@@ -105,10 +105,35 @@ jobs:
             libsfml-dev libcsfml-dev \
             libxrandr-dev libxcursor-dev libudev-dev libopenal-dev libflac-dev libvorbis-dev libgl1-mesa-dev libegl1-mesa-dev
 
-      - name: Install SFML (Windows)
+
+    - name: Cache deps
+      uses: actions/cache@v3
+      id: cache-deps
+      # make the key depend on the dependency version
+      with:
+        path: |
+          ${{ env.BUILD_DIR }}/_deps
+        key: cache-${{ matrix.cmake_generator }}-${{ matrix.os }}-${{ matrix.cxx }}-${{ env.BUILD_TYPE }}-${{ env.SFML_VERSION }}
+
+
+      - name: Cache SFML
+        uses: actions/cache@v3
+        id: cache-sfml
         if: runner.os == 'Windows'
+        with:
+          path: SFML
+          key: ${{ runner.os }}-${{ env.SFML_VER }}
+
+      - name: Download SFML (Windows)
+        if: runner.os == 'Windows' && steps.cache-sfml.outputs.cache-hit != 'true'
         run: |
-          vcpkg install --triplet=x64-mingw-dynamic sfml
+          git clone --depth 1 --branch 2.5.1 https://github.com/SFML/SFML.git
+          cd SFML
+          CMAKE_GENERATOR=Ninja cmake -B sfml_build -S . -DCMAKE_INSTALL_PREFIX=sfml_bin
+          cmake --build sfml_build
+          cmake --install sfml_build
+          ls -l
+        
 
       - name: Cache CSFML
         uses: actions/cache@v3
@@ -120,7 +145,6 @@ jobs:
 
       - name: Download CSFML (Windows)
         uses: suisei-cn/actions-download-file@v1
-        id: download-csfml
         if: runner.os == 'Windows' && steps.cache-csfml.outputs.cache-hit != 'true'
         with:
           url: "https://www.sfml-dev.org/files/CSFML-${{ env.CSFML_VER }}-windows-64-bit.zip"

@@ -90,13 +90,13 @@ jobs:
       - name: Install Valgrind and SFML/CSFML
         if: runner.os == 'Linux' && startsWith(matrix.cc, 'gcc')
         run: |
-          sudo apt update
-          sudo apt install --no-install-recommends valgrind
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends valgrind
 
       - name: Install SFML/CSFML
         if: runner.os == 'Linux'
         run: |
-          sudo apt install --no-install-recommends \
+          sudo apt-get install --no-install-recommends \
             libsfml-dev libcsfml-dev \
             libxrandr-dev libxcursor-dev libudev-dev libopenal-dev libflac-dev libvorbis-dev libgl1-mesa-dev libegl1-mesa-dev
 

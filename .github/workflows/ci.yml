@@ -92,6 +92,10 @@ jobs:
         run: |
           sudo apt update
           sudo apt install --no-install-recommends valgrind
+
+      - name: Install SFML/CSFML
+        if: runner.os == 'Linux'
+        run: |
           sudo apt install --no-install-recommends \
             libsfml-dev libcsfml-dev \
             libxrandr-dev libxcursor-dev libudev-dev libopenal-dev libflac-dev libvorbis-dev libgl1-mesa-dev libegl1-mesa-dev
@@ -125,7 +129,8 @@ jobs:
             -Iext/include/rlutil \
             -o "${EXECUTABLE_NAME}" \
             -lm \
-            -lcsfml-graphics -lcsfml-window -lcsfml-system
+            -lcsfml-graphics -lcsfml-window -lcsfml-system \
+            -Wl,-rpath="\$ORIGIN/libs",--disable-new-dtags
           mkdir -p libs
           ldd "./${EXECUTABLE_NAME}" | grep sfml | sed -E "s|.*(/lib/.*) \(.*|\1|"| xargs -I% cp -L % libs
 
@@ -156,7 +161,7 @@ jobs:
       - name: Copy deps
         if: runner.os == 'Linux'
         run: |
-          cp libs/* ${{ env.ZIP_NAME }}
+          cp libs/* ${{ env.ZIP_NAME }}/libs
 
       ########################################################################
 

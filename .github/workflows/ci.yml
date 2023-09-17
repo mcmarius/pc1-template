@@ -115,7 +115,7 @@ jobs:
           key: ${{ runner.os }}-csfml-${{ env.CSFML_VER }}
 
       - name: Download CSFML (Windows)
-        uses: suisei-cn/actions-download-file@v1.4
+        uses: suisei-cn/actions-download-file@v1.4.0
         if: runner.os == 'Windows' && steps.cache-csfml.outputs.cache-hit != 'true'
         with:
           url: "https://www.sfml-dev.org/files/CSFML-${{ env.CSFML_VER }}-windows-64-bit.zip"

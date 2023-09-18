@@ -176,6 +176,8 @@ jobs:
         if: runner.os == 'macOS'
         run: |
           bash macos_fixes.sh
+          # copy executable again because this one is patched
+          cp ./"${EXECUTABLE_NAME}" ${{ env.ZIP_NAME }}
           mkdir ${{ env.ZIP_NAME }}/lib/
           cp -r lib/ ${{ env.ZIP_NAME }}/lib/
           chmod +x ${{ env.ZIP_NAME }}/"${EXECUTABLE_NAME}"

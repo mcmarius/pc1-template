@@ -19,5 +19,5 @@ install_name_tool -change /usr/local/opt/freetype/lib/libfreetype.6.dylib @execu
 install_name_tool -change @rpath/libsfml-system.2.6.dylib @executable_path/lib/libsfml-system.2.6.dylib lib/libsfml-window.2.6.dylib
 #
 install_name_tool -change /usr/local/opt/libpng/lib/libpng16.16.dylib @executable_path/lib/libpng16.16.dylib lib/libfreetype.6.dylib
-
+install_name_tool -change @loader_path/../../../../opt/libpng/lib/libpng16.16.dylib @executable_path/lib/libpng16.16.dylib lib/libfreetype.6.dylib
 

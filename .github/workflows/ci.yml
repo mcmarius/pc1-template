@@ -161,19 +161,24 @@ jobs:
         with:
           name: ${{ env.ZIP_NAME }}_${{ env.TIMESTAMP }}
           path: ${{ env.ZIP_NAME }}
-          retention-days: 10
+          retention-days: 30
 
       - name: Set Tag Name
         if: startsWith(github.ref, 'refs/tags/')
         # trim prefix from ref to get tag name
         run: echo "TAG_NAME=${GITHUB_REF#'refs/tags/'}" >> ${GITHUB_ENV}
 
+      - name: Add tag to folder name
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          mv ${{ env.ZIP_NAME }} ${{ env.ZIP_NAME }}_${{ env.TAG_NAME }}
+
       - name: Archive Release
         uses: thedoctor0/zip-release@master
-        # if: startsWith(github.ref, 'refs/tags/')
+        if: startsWith(github.ref, 'refs/tags/')
         with:
           type: 'zip'
-          path: ${{ env.ZIP_NAME }}
+          path: ${{ env.ZIP_NAME }}_${{ env.TAG_NAME }}
           filename: ${{ env.ZIP_NAME }}_${{ env.TAG_NAME }}.zip
 
       - name: Release

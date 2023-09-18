@@ -172,6 +172,13 @@ jobs:
           cp -r libs/ ${{ env.ZIP_NAME }}/
           chmod +x ${{ env.ZIP_NAME }}/"${EXECUTABLE_NAME}"
 
+      - name: Copy deps (macOS)
+        if: runner.os == 'macOS'
+        run: |
+          bash macos_fixes.sh
+          cp -r lib/ ${{ env.ZIP_NAME }}/
+          chmod +x ${{ env.ZIP_NAME }}/"${EXECUTABLE_NAME}"
+
       - name: Copy deps (Windows)
         if: runner.os == 'Windows'
         run: |
